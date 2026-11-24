@@ -29,7 +29,7 @@ jobs:
       - name: Extract NOVA PLAY project
         run: |
           mkdir project
-          unzip -q NOVA_PLAY_3.0.3_AUDIO_BRIDGE_FIX.zip -d project
+          unzip -q NOVA_PLAY_3.0.4_MUSIC_ONLY.zip -d project
 
       - name: Locate Android setup script
         run: |
@@ -58,6 +58,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: NOVA-PLAY-3.0.3-APK
+          name: NOVA-PLAY-3.0.4-MUSIC-ONLY-APK
           path: ${{ env.PROJECT_DIR }}/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error

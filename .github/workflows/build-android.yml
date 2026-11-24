@@ -4,17 +4,18 @@ name: Build NOVA PLAY APK
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -25,31 +26,38 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Extract project
+      - name: Extract NOVA PLAY project
         run: |
           mkdir project
-          unzip -q NOVA_PLAY_3.0.2_PHONE_BUILD.zip -d project
+          unzip -q NOVA_PLAY_3.0.3_AUDIO_BRIDGE_FIX.zip -d project
 
-      - name: Locate project folder
+      - name: Locate Android setup script
         run: |
           SCRIPT_PATH="$(find project -type f -name setup-android.sh -print -quit)"
+
           if [ -z "$SCRIPT_PATH" ]; then
             echo "ERROR: setup-android.sh not found"
+            find project -maxdepth 4 -type f
             exit 1
           fi
+
           PROJECT_DIR="$(dirname "$SCRIPT_PATH")"
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
-      - name: Build Android APK
+      - name: Prepare Android project
         run: |
           cd "$PROJECT_DIR"
           bash setup-android.sh
-          cd android
+
+      - name: Build APK
+        run: |
+          cd "$PROJECT_DIR/android"
           chmod +x gradlew
           ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: NOVA-PLAY-APK
+          name: NOVA-PLAY-3.0.3-APK
           path: ${{ env.PROJECT_DIR }}/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
